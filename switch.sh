@@ -2,16 +2,15 @@
 
 source config.env
 
+# Define an array of options
+options=("$USER_1" "$USER_2")
+
 # Check which Git account is currently set as global
 CURRENT_USER=$(git config --global user.name)
 
-# Define an array of options
-options=("$USER_1" "$USER_2" "Don't Switch")
+options+=("Quit")
 num_options=${#options[@]}
-
-# Initialize the selected option
 selected=0
-
 Purple='\033[0;35m'
 Green='\033[0;32m'
 NC='\033[0m' # No Color
@@ -45,22 +44,29 @@ while true; do
     display_menu
     ;;
   "") # Enter key
-    if [ $selected -eq 0 ] && [ "$CURRENT_USER" != "$USER_1" ]; then
-      git config --global user.name "$USER_1"
-      git config --global user.email "$EMAIL_1"
-      echo "Switched to $USER_1 Git account"
-      break
-    elif [ $selected -eq 1 ] && [ "$CURRENT_USER" != "$USER_2" ]; then
-      git config --global user.name "$USER_2"
-      git config --global user.email "$EMAIL_2"
-      echo "Switched to $USER_2 Git account"
-      break
-    elif [ $selected -eq $((num_options - 1)) ]; then
-      break
-    else
-      echo "Already using $CURRENT_USER Git account"
-      break
-    fi
+    for ((i = 0; i < num_options; i++)); do
+      if [ $CURRENT_USER == "${options[i]}" ] && [ $i -eq $selected ]; then
+        clear
+        echo "Already using $CURRENT_USER Git account"
+        exit 0
+      fi
+      if [ $selected -eq $((num_options - 1)) ]; then
+        clear
+        exit 0
+      fi
+      if [ $i -eq $selected ]; then
+        j=$((i + 1))
+        user_var="USER_$j"
+        user_value="${!user_var}"
+        email_var="EMAIL_$j"
+        email_value="${!email_var}"
+        git config --global user.name "$user_value"
+        git config --global user.email "$email_value"
+        clear
+        echo "Switched to $user_value Git account"
+        exit 0
+      fi
+    done
     ;;
   esac
 done
