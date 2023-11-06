@@ -2,18 +2,86 @@
 
 source config.env
 
-# Define an array of options
-options=("$USER_1" "$USER_2")
+options=()
+num_options=0
 
-# Check which Git account is currently set as global
+# Read the .env file line by line
+while IFS= read -r line; do
+  # Skip empty lines and comments
+  if [[ -n "$line" && "$line" != "#"* ]]; then
+    IFS="=" read -r var_name var_value <<< "$line"
+    if [[ "$var_name" == *USER* ]]; then
+      options+=($var_value)
+      num_options=$((num_options + 1))
+    fi
+  fi
+done < "config.env"
+
 CURRENT_USER=$(git config --global user.name)
-
 options+=("Quit")
-num_options=${#options[@]}
+num_options=$((num_options + 1))
 selected=0
+VERSION="1.0.0"
 Purple='\033[0;35m'
 Green='\033[0;32m'
 NC='\033[0m' # No Color
+
+display_version() {
+  echo "switch $VERSION"
+  exit 0
+}
+
+display_help() {
+  echo "Usage: switch [OPTION]..."
+  echo "Switch between Git accounts"
+  echo ""
+  echo "  -v, --version         display version"
+  echo "  -h, --help            display help"
+  echo ""
+  echo "Report bugs to:"
+  echo "https://github.com/spr021/Git-Multiple/issues"
+  exit 0
+}
+
+add_user() {
+  j=$((num_options + 1))
+  echo "Adding new user"
+  echo "Enter new user name: "
+  read new_user
+  echo "Enter new user email: "
+  read new_email
+  echo "New user: $new_user"
+  echo "New email: $new_email"
+  echo "Adding new user to config.env"
+  echo "USER_$j=$new_user" >>config.env
+  echo "EMAIL_$j=$new_email" >>config.env
+  echo "New user added"
+  exit 0
+}
+
+# Parse command line arguments
+while true; do
+  case "$1" in
+  -v | --version)
+    display_version
+    shift
+    ;;
+  -h | --help)
+    display_help
+    shift
+    ;;
+  -a | --add)
+    add_user
+    shift 2
+    ;;
+  --)
+    shift
+    break
+    ;;
+  *) break ;;
+  esac
+done
+
 
 # Function to display the menu
 display_menu() {
