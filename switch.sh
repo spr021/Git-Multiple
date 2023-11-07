@@ -9,13 +9,13 @@ num_options=0
 while IFS= read -r line; do
   # Skip empty lines and comments
   if [[ -n "$line" && "$line" != "#"* ]]; then
-    IFS="=" read -r var_name var_value <<< "$line"
+    IFS="=" read -r var_name var_value <<<"$line"
     if [[ "$var_name" == *USER* ]]; then
       options+=($var_value)
       num_options=$((num_options + 1))
     fi
   fi
-done < "config.env"
+done <"config.env"
 
 if [ $num_options -eq 0 ]; then
   echo "No users found in config.env"
@@ -31,6 +31,12 @@ VERSION="1.0.0"
 Purple='\033[0;35m'
 Green='\033[0;32m'
 NC='\033[0m' # No Color
+
+if [ $CURRENT_USER == "" ] && [ $num_options -eq 1 ]; then
+  echo "No Git account found"
+  echo "Add a user with the -a flag"
+  exit 0
+fi
 
 display_version() {
   echo "switch $VERSION"
@@ -88,11 +94,16 @@ while true; do
   esac
 done
 
-
 # Function to display the menu
 display_menu() {
   clear
-  echo -e "${Green}Current Git account: $CURRENT_USER${NC}"
+  if [ "$CURRENT_USER" == "" ]; then
+    echo "No Git account found"
+    echo "Please select a user to set up Git"
+    echo ""
+  else
+    echo -e "${Green}Current Git account: $CURRENT_USER${NC}"
+  fi
   for ((i = 0; i < num_options; i++)); do
     if [ $i -eq $selected ]; then
       echo -e "${Purple}${options[i]}${NC}"
