@@ -17,6 +17,12 @@ while IFS= read -r line; do
   fi
 done < "config.env"
 
+if [ $num_options -eq 0 ]; then
+  echo "No users found in config.env"
+  echo "Add a user with the -a flag"
+  exit 0
+fi
+
 CURRENT_USER=$(git config --global user.name)
 options+=("Quit")
 num_options=$((num_options + 1))
