@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Check if config file not found create one and add existing users
+if [ ! -f config.env ]; then
+  touch config.env
+  echo "# Add users in the format USER_1=username" >>config.env
+  echo "# Add users in the format EMAIL_1=email" >>config.env
+  echo "USER_1=$(git config --global user.name)" >>config.env
+  echo "EMAIL_1=$(git config --global user.email)" >>config.env
+fi
+
 source config.env
 
 options=()
