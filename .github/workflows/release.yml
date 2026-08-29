@@ -76,7 +76,7 @@ jobs:
           merge-multiple: true
       - name: Write SHA-256 checksums
         working-directory: release-assets
-        run: sha256sum git-multiple-* > SHA256SUMS.txt
+        run: sha256sum git-multiple-* git-multiple.pyz > SHA256SUMS.txt
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
