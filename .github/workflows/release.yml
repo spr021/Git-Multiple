@@ -30,16 +30,16 @@ jobs:
             asset: git-multiple-windows-x64
             output: dist/git-multiple-windows-x64.exe
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Run tests on target OS
         run: python -m unittest discover -v
       - name: Install native application builder
-        run: python -m pip install pyinstaller
+        run: python -m pip install pyinstaller .
       - name: Build one-file application
-        run: pyinstaller --clean --onefile --name ${{ matrix.asset }} scripts/standalone_entry.py
+        run: pyinstaller --clean --onefile --paths . --name ${{ matrix.asset }} scripts/standalone_entry.py
       - name: Smoke-test native application
         run: python -c "import subprocess; subprocess.run([r'${{ matrix.output }}', '--version'], check=True)"
       - uses: actions/upload-artifact@v4
@@ -52,8 +52,8 @@ jobs:
     name: Build portable Python application
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - run: python scripts/build_zipapp.py
