@@ -20,7 +20,7 @@ jobs:
           - os: ubuntu-latest
             asset: git-multiple-linux-x64
             output: dist/git-multiple-linux-x64
-          - os: macos-13
+          - os: macos-15-intel
             asset: git-multiple-macos-x64
             output: dist/git-multiple-macos-x64
           - os: macos-14
